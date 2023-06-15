@@ -19,11 +19,14 @@ import (
 // OrganizationQuery is the builder for querying Organization entities.
 type OrganizationQuery struct {
 	config
-	ctx        *QueryContext
-	order      []organization.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Organization
-	withUsers  *UserQuery
+	ctx            *QueryContext
+	order          []organization.OrderOption
+	inters         []Interceptor
+	predicates     []predicate.Organization
+	withUsers      *UserQuery
+	modifiers      []func(*sql.Selector)
+	loadTotal      []func(context.Context, []*Organization) error
+	withNamedUsers map[string]*UserQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -383,6 +386,9 @@ func (oq *OrganizationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(oq.modifiers) > 0 {
+		_spec.Modifiers = oq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -396,6 +402,18 @@ func (oq *OrganizationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 		if err := oq.loadUsers(ctx, query, nodes,
 			func(n *Organization) { n.Edges.Users = []*User{} },
 			func(n *Organization, e *User) { n.Edges.Users = append(n.Edges.Users, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range oq.withNamedUsers {
+		if err := oq.loadUsers(ctx, query, nodes,
+			func(n *Organization) { n.appendNamedUsers(name) },
+			func(n *Organization, e *User) { n.appendNamedUsers(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range oq.loadTotal {
+		if err := oq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -438,6 +456,9 @@ func (oq *OrganizationQuery) loadUsers(ctx context.Context, query *UserQuery, no
 
 func (oq *OrganizationQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := oq.querySpec()
+	if len(oq.modifiers) > 0 {
+		_spec.Modifiers = oq.modifiers
+	}
 	_spec.Node.Columns = oq.ctx.Fields
 	if len(oq.ctx.Fields) > 0 {
 		_spec.Unique = oq.ctx.Unique != nil && *oq.ctx.Unique
@@ -515,6 +536,20 @@ func (oq *OrganizationQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedUsers tells the query-builder to eager-load the nodes that are connected to the "users"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (oq *OrganizationQuery) WithNamedUsers(name string, opts ...func(*UserQuery)) *OrganizationQuery {
+	query := (&UserClient{config: oq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if oq.withNamedUsers == nil {
+		oq.withNamedUsers = make(map[string]*UserQuery)
+	}
+	oq.withNamedUsers[name] = query
+	return oq
 }
 
 // OrganizationGroupBy is the group-by builder for Organization entities.

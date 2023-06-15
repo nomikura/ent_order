@@ -1,0 +1,33 @@
+# 使用するgraphqlの定義ファイル
+schema:
+  - ./graph/*.graphql
+
+exec:
+  layout: follow-schema
+  dir: graph/generated
+  package: generated
+
+# resolverの定義
+resolver:
+  layout: follow-schema
+  dir: graph
+  package: graph
+  filename_template: "{name}.resolvers.go"
+
+# modelの定義
+model:
+  filename: graph/model/models_gen.go
+  package: model
+
+# entで定義した型をgqlgenで使えるようにする
+autobind:
+  - bequem.co.jp/uciportal/ent
+
+# resolverのコメントにgqlgenのバージョンを記載しない
+omit_gqlgen_version_in_file_notice: true
+
+# カスタムモデルの使用
+models:
+  ID:
+    model:
+      - github.com/99designs/gqlgen/graphql.IntID

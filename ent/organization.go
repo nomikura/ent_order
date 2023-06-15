@@ -33,6 +33,10 @@ type OrganizationEdges struct {
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
+	// totalCount holds the count of the edges above.
+	totalCount [1]map[string]int
+
+	namedUsers map[string][]*User
 }
 
 // UsersOrErr returns the Users value or an error if the edge
@@ -134,6 +138,30 @@ func (o *Organization) String() string {
 	builder.WriteString(fmt.Sprintf("%v", o.Priority))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// NamedUsers returns the Users named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (o *Organization) NamedUsers(name string) ([]*User, error) {
+	if o.Edges.namedUsers == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := o.Edges.namedUsers[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (o *Organization) appendNamedUsers(name string, edges ...*User) {
+	if o.Edges.namedUsers == nil {
+		o.Edges.namedUsers = make(map[string][]*User)
+	}
+	if len(edges) == 0 {
+		o.Edges.namedUsers[name] = []*User{}
+	} else {
+		o.Edges.namedUsers[name] = append(o.Edges.namedUsers[name], edges...)
+	}
 }
 
 // Organizations is a parsable slice of Organization.
