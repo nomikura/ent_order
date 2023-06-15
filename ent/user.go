@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"entdemo/ent/organization"
 	"entdemo/ent/user"
 	"fmt"
 	"strings"
@@ -17,8 +18,34 @@ type User struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// University holds the value of the "university" field.
-	University   string `json:"university,omitempty"`
-	selectValues sql.SelectValues
+	University string `json:"university,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges             UserEdges `json:"edges"`
+	user_organization *int
+	selectValues      sql.SelectValues
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// Organization holds the value of the organization edge.
+	Organization *Organization `json:"organization,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// OrganizationOrErr returns the Organization value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e UserEdges) OrganizationOrErr() (*Organization, error) {
+	if e.loadedTypes[0] {
+		if e.Organization == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: organization.Label}
+		}
+		return e.Organization, nil
+	}
+	return nil, &NotLoadedError{edge: "organization"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -30,6 +57,8 @@ func (*User) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case user.FieldUniversity:
 			values[i] = new(sql.NullString)
+		case user.ForeignKeys[0]: // user_organization
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -57,6 +86,13 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.University = value.String
 			}
+		case user.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field user_organization", value)
+			} else if value.Valid {
+				u.user_organization = new(int)
+				*u.user_organization = int(value.Int64)
+			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
 		}
@@ -68,6 +104,11 @@ func (u *User) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
+}
+
+// QueryOrganization queries the "organization" edge of the User entity.
+func (u *User) QueryOrganization() *OrganizationQuery {
+	return NewUserClient(u.config).QueryOrganization(u)
 }
 
 // Update returns a builder for updating this User.

@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"entdemo/ent/organization"
 	"entdemo/ent/user"
 	"errors"
 	"fmt"
@@ -23,6 +24,25 @@ type UserCreate struct {
 func (uc *UserCreate) SetUniversity(s string) *UserCreate {
 	uc.mutation.SetUniversity(s)
 	return uc
+}
+
+// SetOrganizationID sets the "organization" edge to the Organization entity by ID.
+func (uc *UserCreate) SetOrganizationID(id int) *UserCreate {
+	uc.mutation.SetOrganizationID(id)
+	return uc
+}
+
+// SetNillableOrganizationID sets the "organization" edge to the Organization entity by ID if the given value is not nil.
+func (uc *UserCreate) SetNillableOrganizationID(id *int) *UserCreate {
+	if id != nil {
+		uc = uc.SetOrganizationID(*id)
+	}
+	return uc
+}
+
+// SetOrganization sets the "organization" edge to the Organization entity.
+func (uc *UserCreate) SetOrganization(o *Organization) *UserCreate {
+	return uc.SetOrganizationID(o.ID)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -91,6 +111,23 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.University(); ok {
 		_spec.SetField(user.FieldUniversity, field.TypeString, value)
 		_node.University = value
+	}
+	if nodes := uc.mutation.OrganizationIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   user.OrganizationTable,
+			Columns: []string{user.OrganizationColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(organization.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.user_organization = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
