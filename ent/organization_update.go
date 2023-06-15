@@ -6,7 +6,6 @@ import (
 	"context"
 	"entdemo/ent/organization"
 	"entdemo/ent/predicate"
-	"entdemo/ent/user"
 	"errors"
 	"fmt"
 
@@ -47,45 +46,9 @@ func (ou *OrganizationUpdate) AddPriority(i int) *OrganizationUpdate {
 	return ou
 }
 
-// AddUserIDs adds the "users" edge to the User entity by IDs.
-func (ou *OrganizationUpdate) AddUserIDs(ids ...int) *OrganizationUpdate {
-	ou.mutation.AddUserIDs(ids...)
-	return ou
-}
-
-// AddUsers adds the "users" edges to the User entity.
-func (ou *OrganizationUpdate) AddUsers(u ...*User) *OrganizationUpdate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return ou.AddUserIDs(ids...)
-}
-
 // Mutation returns the OrganizationMutation object of the builder.
 func (ou *OrganizationUpdate) Mutation() *OrganizationMutation {
 	return ou.mutation
-}
-
-// ClearUsers clears all "users" edges to the User entity.
-func (ou *OrganizationUpdate) ClearUsers() *OrganizationUpdate {
-	ou.mutation.ClearUsers()
-	return ou
-}
-
-// RemoveUserIDs removes the "users" edge to User entities by IDs.
-func (ou *OrganizationUpdate) RemoveUserIDs(ids ...int) *OrganizationUpdate {
-	ou.mutation.RemoveUserIDs(ids...)
-	return ou
-}
-
-// RemoveUsers removes "users" edges to User entities.
-func (ou *OrganizationUpdate) RemoveUsers(u ...*User) *OrganizationUpdate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return ou.RemoveUserIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -146,51 +109,6 @@ func (ou *OrganizationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := ou.mutation.AddedPriority(); ok {
 		_spec.AddField(organization.FieldPriority, field.TypeInt, value)
 	}
-	if ou.mutation.UsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   organization.UsersTable,
-			Columns: []string{organization.UsersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ou.mutation.RemovedUsersIDs(); len(nodes) > 0 && !ou.mutation.UsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   organization.UsersTable,
-			Columns: []string{organization.UsersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ou.mutation.UsersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   organization.UsersTable,
-			Columns: []string{organization.UsersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, ou.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{organization.Label}
@@ -230,45 +148,9 @@ func (ouo *OrganizationUpdateOne) AddPriority(i int) *OrganizationUpdateOne {
 	return ouo
 }
 
-// AddUserIDs adds the "users" edge to the User entity by IDs.
-func (ouo *OrganizationUpdateOne) AddUserIDs(ids ...int) *OrganizationUpdateOne {
-	ouo.mutation.AddUserIDs(ids...)
-	return ouo
-}
-
-// AddUsers adds the "users" edges to the User entity.
-func (ouo *OrganizationUpdateOne) AddUsers(u ...*User) *OrganizationUpdateOne {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return ouo.AddUserIDs(ids...)
-}
-
 // Mutation returns the OrganizationMutation object of the builder.
 func (ouo *OrganizationUpdateOne) Mutation() *OrganizationMutation {
 	return ouo.mutation
-}
-
-// ClearUsers clears all "users" edges to the User entity.
-func (ouo *OrganizationUpdateOne) ClearUsers() *OrganizationUpdateOne {
-	ouo.mutation.ClearUsers()
-	return ouo
-}
-
-// RemoveUserIDs removes the "users" edge to User entities by IDs.
-func (ouo *OrganizationUpdateOne) RemoveUserIDs(ids ...int) *OrganizationUpdateOne {
-	ouo.mutation.RemoveUserIDs(ids...)
-	return ouo
-}
-
-// RemoveUsers removes "users" edges to User entities.
-func (ouo *OrganizationUpdateOne) RemoveUsers(u ...*User) *OrganizationUpdateOne {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return ouo.RemoveUserIDs(ids...)
 }
 
 // Where appends a list predicates to the OrganizationUpdate builder.
@@ -358,51 +240,6 @@ func (ouo *OrganizationUpdateOne) sqlSave(ctx context.Context) (_node *Organizat
 	}
 	if value, ok := ouo.mutation.AddedPriority(); ok {
 		_spec.AddField(organization.FieldPriority, field.TypeInt, value)
-	}
-	if ouo.mutation.UsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   organization.UsersTable,
-			Columns: []string{organization.UsersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ouo.mutation.RemovedUsersIDs(); len(nodes) > 0 && !ouo.mutation.UsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   organization.UsersTable,
-			Columns: []string{organization.UsersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ouo.mutation.UsersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   organization.UsersTable,
-			Columns: []string{organization.UsersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Organization{config: ouo.config}
 	_spec.Assign = _node.assignValues

@@ -6,16 +6,12 @@ package ent
 type CreateOrganizationInput struct {
 	Name     string
 	Priority int
-	UserIDs  []int
 }
 
 // Mutate applies the CreateOrganizationInput on the OrganizationMutation builder.
 func (i *CreateOrganizationInput) Mutate(m *OrganizationMutation) {
 	m.SetName(i.Name)
 	m.SetPriority(i.Priority)
-	if v := i.UserIDs; len(v) > 0 {
-		m.AddUserIDs(v...)
-	}
 }
 
 // SetInput applies the change-set in the CreateOrganizationInput on the OrganizationCreate builder.
@@ -26,11 +22,8 @@ func (c *OrganizationCreate) SetInput(i CreateOrganizationInput) *OrganizationCr
 
 // UpdateOrganizationInput represents a mutation input for updating organizations.
 type UpdateOrganizationInput struct {
-	Name          *string
-	Priority      *int
-	ClearUsers    bool
-	AddUserIDs    []int
-	RemoveUserIDs []int
+	Name     *string
+	Priority *int
 }
 
 // Mutate applies the UpdateOrganizationInput on the OrganizationMutation builder.
@@ -40,15 +33,6 @@ func (i *UpdateOrganizationInput) Mutate(m *OrganizationMutation) {
 	}
 	if v := i.Priority; v != nil {
 		m.SetPriority(*v)
-	}
-	if i.ClearUsers {
-		m.ClearUsers()
-	}
-	if v := i.AddUserIDs; len(v) > 0 {
-		m.AddUserIDs(v...)
-	}
-	if v := i.RemoveUserIDs; len(v) > 0 {
-		m.RemoveUserIDs(v...)
 	}
 }
 

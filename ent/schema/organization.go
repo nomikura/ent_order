@@ -4,7 +4,6 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
-	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -21,13 +20,6 @@ func (Organization) Fields() []ent.Field {
 			Annotations(
 				entgql.OrderField("PRIORITY"),
 			),
-	}
-}
-
-func (Organization) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.From("users", User.Type).
-			Ref("organization"),
 	}
 }
 

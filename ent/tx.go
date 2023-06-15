@@ -14,8 +14,6 @@ type Tx struct {
 	config
 	// Organization is the client for interacting with the Organization builders.
 	Organization *OrganizationClient
-	// User is the client for interacting with the User builders.
-	User *UserClient
 
 	// lazily loaded.
 	client     *Client
@@ -148,7 +146,6 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Organization = NewOrganizationClient(tx.config)
-	tx.User = NewUserClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

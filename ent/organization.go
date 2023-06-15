@@ -19,33 +19,8 @@ type Organization struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Priority holds the value of the "priority" field.
-	Priority int `json:"priority,omitempty"`
-	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the OrganizationQuery when eager-loading is set.
-	Edges        OrganizationEdges `json:"edges"`
+	Priority     int `json:"priority,omitempty"`
 	selectValues sql.SelectValues
-}
-
-// OrganizationEdges holds the relations/edges for other nodes in the graph.
-type OrganizationEdges struct {
-	// Users holds the value of the users edge.
-	Users []*User `json:"users,omitempty"`
-	// loadedTypes holds the information for reporting if a
-	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
-	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
-
-	namedUsers map[string][]*User
-}
-
-// UsersOrErr returns the Users value or an error if the edge
-// was not loaded in eager-loading.
-func (e OrganizationEdges) UsersOrErr() ([]*User, error) {
-	if e.loadedTypes[0] {
-		return e.Users, nil
-	}
-	return nil, &NotLoadedError{edge: "users"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -103,11 +78,6 @@ func (o *Organization) Value(name string) (ent.Value, error) {
 	return o.selectValues.Get(name)
 }
 
-// QueryUsers queries the "users" edge of the Organization entity.
-func (o *Organization) QueryUsers() *UserQuery {
-	return NewOrganizationClient(o.config).QueryUsers(o)
-}
-
 // Update returns a builder for updating this Organization.
 // Note that you need to call Organization.Unwrap() before calling this method if this Organization
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -138,30 +108,6 @@ func (o *Organization) String() string {
 	builder.WriteString(fmt.Sprintf("%v", o.Priority))
 	builder.WriteByte(')')
 	return builder.String()
-}
-
-// NamedUsers returns the Users named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (o *Organization) NamedUsers(name string) ([]*User, error) {
-	if o.Edges.namedUsers == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := o.Edges.namedUsers[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (o *Organization) appendNamedUsers(name string, edges ...*User) {
-	if o.Edges.namedUsers == nil {
-		o.Edges.namedUsers = make(map[string][]*User)
-	}
-	if len(edges) == 0 {
-		o.Edges.namedUsers[name] = []*User{}
-	} else {
-		o.Edges.namedUsers[name] = append(o.Edges.namedUsers[name], edges...)
-	}
 }
 
 // Organizations is a parsable slice of Organization.

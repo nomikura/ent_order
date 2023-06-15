@@ -5,7 +5,6 @@ package ent
 import (
 	"context"
 	"entdemo/ent/organization"
-	"entdemo/ent/user"
 	"errors"
 	"fmt"
 
@@ -30,21 +29,6 @@ func (oc *OrganizationCreate) SetName(s string) *OrganizationCreate {
 func (oc *OrganizationCreate) SetPriority(i int) *OrganizationCreate {
 	oc.mutation.SetPriority(i)
 	return oc
-}
-
-// AddUserIDs adds the "users" edge to the User entity by IDs.
-func (oc *OrganizationCreate) AddUserIDs(ids ...int) *OrganizationCreate {
-	oc.mutation.AddUserIDs(ids...)
-	return oc
-}
-
-// AddUsers adds the "users" edges to the User entity.
-func (oc *OrganizationCreate) AddUsers(u ...*User) *OrganizationCreate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return oc.AddUserIDs(ids...)
 }
 
 // Mutation returns the OrganizationMutation object of the builder.
@@ -125,22 +109,6 @@ func (oc *OrganizationCreate) createSpec() (*Organization, *sqlgraph.CreateSpec)
 	if value, ok := oc.mutation.Priority(); ok {
 		_spec.SetField(organization.FieldPriority, field.TypeInt, value)
 		_node.Priority = value
-	}
-	if nodes := oc.mutation.UsersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   organization.UsersTable,
-			Columns: []string{organization.UsersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
