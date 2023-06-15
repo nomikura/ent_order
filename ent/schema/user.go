@@ -18,18 +18,23 @@ func (User) Fields() []ent.Field {
 			Annotations(
 				entgql.OrderField("UNIVERSITY"),
 			),
+		field.Int("organization_id").
+			Optional().
+			Nillable(),
 	}
 }
 
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("organization", Organization.Type).
+			Field("organization_id").
 			Unique(),
 	}
 }
 
 func (User) Annotations() []schema.Annotation {
 	return []schema.Annotation{
+		entgql.QueryField(),
 		entgql.RelayConnection(),
 		entgql.MultiOrder(),
 	}

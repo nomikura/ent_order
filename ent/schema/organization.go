@@ -4,6 +4,7 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -12,19 +13,32 @@ type Organization struct {
 	ent.Schema
 }
 
-// Fields of the Organization.
 func (Organization) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("order").
+		field.String("name").
+			NotEmpty(),
+		field.Int("priority").
 			Annotations(
-				entgql.OrderField("ORDER"),
+				entgql.OrderField("PRIORITY"),
 			),
+	}
+}
+
+func (Organization) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.From("users", User.Type).
+			Ref("organization"),
 	}
 }
 
 func (Organization) Annotations() []schema.Annotation {
 	return []schema.Annotation{
+		entgql.QueryField(),
 		entgql.RelayConnection(),
+		entgql.Mutations(
+			entgql.MutationCreate(),
+			entgql.MutationUpdate(),
+		),
 		entgql.MultiOrder(),
 	}
 }

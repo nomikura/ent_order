@@ -19,11 +19,12 @@ type User struct {
 	ID int `json:"id,omitempty"`
 	// University holds the value of the "university" field.
 	University string `json:"university,omitempty"`
+	// OrganizationID holds the value of the "organization_id" field.
+	OrganizationID *int `json:"organization_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
-	Edges             UserEdges `json:"edges"`
-	user_organization *int
-	selectValues      sql.SelectValues
+	Edges        UserEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // UserEdges holds the relations/edges for other nodes in the graph.
@@ -53,12 +54,10 @@ func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldID:
+		case user.FieldID, user.FieldOrganizationID:
 			values[i] = new(sql.NullInt64)
 		case user.FieldUniversity:
 			values[i] = new(sql.NullString)
-		case user.ForeignKeys[0]: // user_organization
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -86,12 +85,12 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.University = value.String
 			}
-		case user.ForeignKeys[0]:
+		case user.FieldOrganizationID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field user_organization", value)
+				return fmt.Errorf("unexpected type %T for field organization_id", values[i])
 			} else if value.Valid {
-				u.user_organization = new(int)
-				*u.user_organization = int(value.Int64)
+				u.OrganizationID = new(int)
+				*u.OrganizationID = int(value.Int64)
 			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
@@ -136,6 +135,11 @@ func (u *User) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", u.ID))
 	builder.WriteString("university=")
 	builder.WriteString(u.University)
+	builder.WriteString(", ")
+	if v := u.OrganizationID; v != nil {
+		builder.WriteString("organization_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

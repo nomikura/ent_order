@@ -11,7 +11,8 @@ var (
 	// OrganizationsColumns holds the columns for the "organizations" table.
 	OrganizationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "order", Type: field.TypeString},
+		{Name: "name", Type: field.TypeString},
+		{Name: "priority", Type: field.TypeInt},
 	}
 	// OrganizationsTable holds the schema information for the "organizations" table.
 	OrganizationsTable = &schema.Table{
@@ -23,7 +24,7 @@ var (
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "university", Type: field.TypeString},
-		{Name: "user_organization", Type: field.TypeInt, Nullable: true},
+		{Name: "organization_id", Type: field.TypeInt, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{

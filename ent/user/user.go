@@ -14,6 +14,8 @@ const (
 	FieldID = "id"
 	// FieldUniversity holds the string denoting the university field in the database.
 	FieldUniversity = "university"
+	// FieldOrganizationID holds the string denoting the organization_id field in the database.
+	FieldOrganizationID = "organization_id"
 	// EdgeOrganization holds the string denoting the organization edge name in mutations.
 	EdgeOrganization = "organization"
 	// Table holds the table name of the user in the database.
@@ -24,30 +26,20 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "organization" package.
 	OrganizationInverseTable = "organizations"
 	// OrganizationColumn is the table column denoting the organization relation/edge.
-	OrganizationColumn = "user_organization"
+	OrganizationColumn = "organization_id"
 )
 
 // Columns holds all SQL columns for user fields.
 var Columns = []string{
 	FieldID,
 	FieldUniversity,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "users"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"user_organization",
+	FieldOrganizationID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -65,6 +57,11 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByUniversity orders the results by the university field.
 func ByUniversity(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUniversity, opts...).ToFunc()
+}
+
+// ByOrganizationID orders the results by the organization_id field.
+func ByOrganizationID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOrganizationID, opts...).ToFunc()
 }
 
 // ByOrganizationField orders the results by organization field.

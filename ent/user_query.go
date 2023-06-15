@@ -23,7 +23,6 @@ type UserQuery struct {
 	inters           []Interceptor
 	predicates       []predicate.User
 	withOrganization *OrganizationQuery
-	withFKs          bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -369,18 +368,11 @@ func (uq *UserQuery) prepareQuery(ctx context.Context) error {
 func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, error) {
 	var (
 		nodes       = []*User{}
-		withFKs     = uq.withFKs
 		_spec       = uq.querySpec()
 		loadedTypes = [1]bool{
 			uq.withOrganization != nil,
 		}
 	)
-	if uq.withOrganization != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, user.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*User).scanValues(nil, columns)
 	}
@@ -412,10 +404,10 @@ func (uq *UserQuery) loadOrganization(ctx context.Context, query *OrganizationQu
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*User)
 	for i := range nodes {
-		if nodes[i].user_organization == nil {
+		if nodes[i].OrganizationID == nil {
 			continue
 		}
-		fk := *nodes[i].user_organization
+		fk := *nodes[i].OrganizationID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -432,7 +424,7 @@ func (uq *UserQuery) loadOrganization(ctx context.Context, query *OrganizationQu
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_organization" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "organization_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -465,6 +457,9 @@ func (uq *UserQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != user.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if uq.withOrganization != nil {
+			_spec.Node.AddColumnOnce(user.FieldOrganizationID)
 		}
 	}
 	if ps := uq.predicates; len(ps) > 0 {

@@ -6,6 +6,7 @@ import (
 	"entdemo/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ID filters vertices based on their ID field.
@@ -53,74 +54,142 @@ func IDLTE(id int) predicate.Organization {
 	return predicate.Organization(sql.FieldLTE(FieldID, id))
 }
 
-// Order applies equality check predicate on the "order" field. It's identical to OrderEQ.
-func Order(v string) predicate.Organization {
-	return predicate.Organization(sql.FieldEQ(FieldOrder, v))
+// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
+func Name(v string) predicate.Organization {
+	return predicate.Organization(sql.FieldEQ(FieldName, v))
 }
 
-// OrderEQ applies the EQ predicate on the "order" field.
-func OrderEQ(v string) predicate.Organization {
-	return predicate.Organization(sql.FieldEQ(FieldOrder, v))
+// Priority applies equality check predicate on the "priority" field. It's identical to PriorityEQ.
+func Priority(v int) predicate.Organization {
+	return predicate.Organization(sql.FieldEQ(FieldPriority, v))
 }
 
-// OrderNEQ applies the NEQ predicate on the "order" field.
-func OrderNEQ(v string) predicate.Organization {
-	return predicate.Organization(sql.FieldNEQ(FieldOrder, v))
+// NameEQ applies the EQ predicate on the "name" field.
+func NameEQ(v string) predicate.Organization {
+	return predicate.Organization(sql.FieldEQ(FieldName, v))
 }
 
-// OrderIn applies the In predicate on the "order" field.
-func OrderIn(vs ...string) predicate.Organization {
-	return predicate.Organization(sql.FieldIn(FieldOrder, vs...))
+// NameNEQ applies the NEQ predicate on the "name" field.
+func NameNEQ(v string) predicate.Organization {
+	return predicate.Organization(sql.FieldNEQ(FieldName, v))
 }
 
-// OrderNotIn applies the NotIn predicate on the "order" field.
-func OrderNotIn(vs ...string) predicate.Organization {
-	return predicate.Organization(sql.FieldNotIn(FieldOrder, vs...))
+// NameIn applies the In predicate on the "name" field.
+func NameIn(vs ...string) predicate.Organization {
+	return predicate.Organization(sql.FieldIn(FieldName, vs...))
 }
 
-// OrderGT applies the GT predicate on the "order" field.
-func OrderGT(v string) predicate.Organization {
-	return predicate.Organization(sql.FieldGT(FieldOrder, v))
+// NameNotIn applies the NotIn predicate on the "name" field.
+func NameNotIn(vs ...string) predicate.Organization {
+	return predicate.Organization(sql.FieldNotIn(FieldName, vs...))
 }
 
-// OrderGTE applies the GTE predicate on the "order" field.
-func OrderGTE(v string) predicate.Organization {
-	return predicate.Organization(sql.FieldGTE(FieldOrder, v))
+// NameGT applies the GT predicate on the "name" field.
+func NameGT(v string) predicate.Organization {
+	return predicate.Organization(sql.FieldGT(FieldName, v))
 }
 
-// OrderLT applies the LT predicate on the "order" field.
-func OrderLT(v string) predicate.Organization {
-	return predicate.Organization(sql.FieldLT(FieldOrder, v))
+// NameGTE applies the GTE predicate on the "name" field.
+func NameGTE(v string) predicate.Organization {
+	return predicate.Organization(sql.FieldGTE(FieldName, v))
 }
 
-// OrderLTE applies the LTE predicate on the "order" field.
-func OrderLTE(v string) predicate.Organization {
-	return predicate.Organization(sql.FieldLTE(FieldOrder, v))
+// NameLT applies the LT predicate on the "name" field.
+func NameLT(v string) predicate.Organization {
+	return predicate.Organization(sql.FieldLT(FieldName, v))
 }
 
-// OrderContains applies the Contains predicate on the "order" field.
-func OrderContains(v string) predicate.Organization {
-	return predicate.Organization(sql.FieldContains(FieldOrder, v))
+// NameLTE applies the LTE predicate on the "name" field.
+func NameLTE(v string) predicate.Organization {
+	return predicate.Organization(sql.FieldLTE(FieldName, v))
 }
 
-// OrderHasPrefix applies the HasPrefix predicate on the "order" field.
-func OrderHasPrefix(v string) predicate.Organization {
-	return predicate.Organization(sql.FieldHasPrefix(FieldOrder, v))
+// NameContains applies the Contains predicate on the "name" field.
+func NameContains(v string) predicate.Organization {
+	return predicate.Organization(sql.FieldContains(FieldName, v))
 }
 
-// OrderHasSuffix applies the HasSuffix predicate on the "order" field.
-func OrderHasSuffix(v string) predicate.Organization {
-	return predicate.Organization(sql.FieldHasSuffix(FieldOrder, v))
+// NameHasPrefix applies the HasPrefix predicate on the "name" field.
+func NameHasPrefix(v string) predicate.Organization {
+	return predicate.Organization(sql.FieldHasPrefix(FieldName, v))
 }
 
-// OrderEqualFold applies the EqualFold predicate on the "order" field.
-func OrderEqualFold(v string) predicate.Organization {
-	return predicate.Organization(sql.FieldEqualFold(FieldOrder, v))
+// NameHasSuffix applies the HasSuffix predicate on the "name" field.
+func NameHasSuffix(v string) predicate.Organization {
+	return predicate.Organization(sql.FieldHasSuffix(FieldName, v))
 }
 
-// OrderContainsFold applies the ContainsFold predicate on the "order" field.
-func OrderContainsFold(v string) predicate.Organization {
-	return predicate.Organization(sql.FieldContainsFold(FieldOrder, v))
+// NameEqualFold applies the EqualFold predicate on the "name" field.
+func NameEqualFold(v string) predicate.Organization {
+	return predicate.Organization(sql.FieldEqualFold(FieldName, v))
+}
+
+// NameContainsFold applies the ContainsFold predicate on the "name" field.
+func NameContainsFold(v string) predicate.Organization {
+	return predicate.Organization(sql.FieldContainsFold(FieldName, v))
+}
+
+// PriorityEQ applies the EQ predicate on the "priority" field.
+func PriorityEQ(v int) predicate.Organization {
+	return predicate.Organization(sql.FieldEQ(FieldPriority, v))
+}
+
+// PriorityNEQ applies the NEQ predicate on the "priority" field.
+func PriorityNEQ(v int) predicate.Organization {
+	return predicate.Organization(sql.FieldNEQ(FieldPriority, v))
+}
+
+// PriorityIn applies the In predicate on the "priority" field.
+func PriorityIn(vs ...int) predicate.Organization {
+	return predicate.Organization(sql.FieldIn(FieldPriority, vs...))
+}
+
+// PriorityNotIn applies the NotIn predicate on the "priority" field.
+func PriorityNotIn(vs ...int) predicate.Organization {
+	return predicate.Organization(sql.FieldNotIn(FieldPriority, vs...))
+}
+
+// PriorityGT applies the GT predicate on the "priority" field.
+func PriorityGT(v int) predicate.Organization {
+	return predicate.Organization(sql.FieldGT(FieldPriority, v))
+}
+
+// PriorityGTE applies the GTE predicate on the "priority" field.
+func PriorityGTE(v int) predicate.Organization {
+	return predicate.Organization(sql.FieldGTE(FieldPriority, v))
+}
+
+// PriorityLT applies the LT predicate on the "priority" field.
+func PriorityLT(v int) predicate.Organization {
+	return predicate.Organization(sql.FieldLT(FieldPriority, v))
+}
+
+// PriorityLTE applies the LTE predicate on the "priority" field.
+func PriorityLTE(v int) predicate.Organization {
+	return predicate.Organization(sql.FieldLTE(FieldPriority, v))
+}
+
+// HasUsers applies the HasEdge predicate on the "users" edge.
+func HasUsers() predicate.Organization {
+	return predicate.Organization(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, UsersTable, UsersColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUsersWith applies the HasEdge predicate on the "users" edge with a given conditions (other predicates).
+func HasUsersWith(preds ...predicate.User) predicate.Organization {
+	return predicate.Organization(func(s *sql.Selector) {
+		step := newUsersStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

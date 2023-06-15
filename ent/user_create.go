@@ -26,16 +26,16 @@ func (uc *UserCreate) SetUniversity(s string) *UserCreate {
 	return uc
 }
 
-// SetOrganizationID sets the "organization" edge to the Organization entity by ID.
-func (uc *UserCreate) SetOrganizationID(id int) *UserCreate {
-	uc.mutation.SetOrganizationID(id)
+// SetOrganizationID sets the "organization_id" field.
+func (uc *UserCreate) SetOrganizationID(i int) *UserCreate {
+	uc.mutation.SetOrganizationID(i)
 	return uc
 }
 
-// SetNillableOrganizationID sets the "organization" edge to the Organization entity by ID if the given value is not nil.
-func (uc *UserCreate) SetNillableOrganizationID(id *int) *UserCreate {
-	if id != nil {
-		uc = uc.SetOrganizationID(*id)
+// SetNillableOrganizationID sets the "organization_id" field if the given value is not nil.
+func (uc *UserCreate) SetNillableOrganizationID(i *int) *UserCreate {
+	if i != nil {
+		uc.SetOrganizationID(*i)
 	}
 	return uc
 }
@@ -126,7 +126,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.user_organization = &nodes[0]
+		_node.OrganizationID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

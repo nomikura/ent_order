@@ -59,6 +59,11 @@ func University(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldUniversity, v))
 }
 
+// OrganizationID applies equality check predicate on the "organization_id" field. It's identical to OrganizationIDEQ.
+func OrganizationID(v int) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldOrganizationID, v))
+}
+
 // UniversityEQ applies the EQ predicate on the "university" field.
 func UniversityEQ(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldUniversity, v))
@@ -122,6 +127,36 @@ func UniversityEqualFold(v string) predicate.User {
 // UniversityContainsFold applies the ContainsFold predicate on the "university" field.
 func UniversityContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldUniversity, v))
+}
+
+// OrganizationIDEQ applies the EQ predicate on the "organization_id" field.
+func OrganizationIDEQ(v int) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldOrganizationID, v))
+}
+
+// OrganizationIDNEQ applies the NEQ predicate on the "organization_id" field.
+func OrganizationIDNEQ(v int) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldOrganizationID, v))
+}
+
+// OrganizationIDIn applies the In predicate on the "organization_id" field.
+func OrganizationIDIn(vs ...int) predicate.User {
+	return predicate.User(sql.FieldIn(FieldOrganizationID, vs...))
+}
+
+// OrganizationIDNotIn applies the NotIn predicate on the "organization_id" field.
+func OrganizationIDNotIn(vs ...int) predicate.User {
+	return predicate.User(sql.FieldNotIn(FieldOrganizationID, vs...))
+}
+
+// OrganizationIDIsNil applies the IsNil predicate on the "organization_id" field.
+func OrganizationIDIsNil() predicate.User {
+	return predicate.User(sql.FieldIsNull(FieldOrganizationID))
+}
+
+// OrganizationIDNotNil applies the NotNil predicate on the "organization_id" field.
+func OrganizationIDNotNil() predicate.User {
+	return predicate.User(sql.FieldNotNull(FieldOrganizationID))
 }
 
 // HasOrganization applies the HasEdge predicate on the "organization" edge.

@@ -34,8 +34,13 @@ type OrganizationMutation struct {
 	op            Op
 	typ           string
 	id            *int
-	_order        *string
+	name          *string
+	priority      *int
+	addpriority   *int
 	clearedFields map[string]struct{}
+	users         map[int]struct{}
+	removedusers  map[int]struct{}
+	clearedusers  bool
 	done          bool
 	oldValue      func(context.Context) (*Organization, error)
 	predicates    []predicate.Organization
@@ -139,40 +144,150 @@ func (m *OrganizationMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
-// SetOrder sets the "order" field.
-func (m *OrganizationMutation) SetOrder(s string) {
-	m._order = &s
+// SetName sets the "name" field.
+func (m *OrganizationMutation) SetName(s string) {
+	m.name = &s
 }
 
-// Order returns the value of the "order" field in the mutation.
-func (m *OrganizationMutation) Order() (r string, exists bool) {
-	v := m._order
+// Name returns the value of the "name" field in the mutation.
+func (m *OrganizationMutation) Name() (r string, exists bool) {
+	v := m.name
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldOrder returns the old "order" field's value of the Organization entity.
+// OldName returns the old "name" field's value of the Organization entity.
 // If the Organization object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *OrganizationMutation) OldOrder(ctx context.Context) (v string, err error) {
+func (m *OrganizationMutation) OldName(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldOrder is only allowed on UpdateOne operations")
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldOrder requires an ID field in the mutation")
+		return v, errors.New("OldName requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldOrder: %w", err)
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
 	}
-	return oldValue.Order, nil
+	return oldValue.Name, nil
 }
 
-// ResetOrder resets all changes to the "order" field.
-func (m *OrganizationMutation) ResetOrder() {
-	m._order = nil
+// ResetName resets all changes to the "name" field.
+func (m *OrganizationMutation) ResetName() {
+	m.name = nil
+}
+
+// SetPriority sets the "priority" field.
+func (m *OrganizationMutation) SetPriority(i int) {
+	m.priority = &i
+	m.addpriority = nil
+}
+
+// Priority returns the value of the "priority" field in the mutation.
+func (m *OrganizationMutation) Priority() (r int, exists bool) {
+	v := m.priority
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPriority returns the old "priority" field's value of the Organization entity.
+// If the Organization object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OrganizationMutation) OldPriority(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPriority is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPriority requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPriority: %w", err)
+	}
+	return oldValue.Priority, nil
+}
+
+// AddPriority adds i to the "priority" field.
+func (m *OrganizationMutation) AddPriority(i int) {
+	if m.addpriority != nil {
+		*m.addpriority += i
+	} else {
+		m.addpriority = &i
+	}
+}
+
+// AddedPriority returns the value that was added to the "priority" field in this mutation.
+func (m *OrganizationMutation) AddedPriority() (r int, exists bool) {
+	v := m.addpriority
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPriority resets all changes to the "priority" field.
+func (m *OrganizationMutation) ResetPriority() {
+	m.priority = nil
+	m.addpriority = nil
+}
+
+// AddUserIDs adds the "users" edge to the User entity by ids.
+func (m *OrganizationMutation) AddUserIDs(ids ...int) {
+	if m.users == nil {
+		m.users = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.users[ids[i]] = struct{}{}
+	}
+}
+
+// ClearUsers clears the "users" edge to the User entity.
+func (m *OrganizationMutation) ClearUsers() {
+	m.clearedusers = true
+}
+
+// UsersCleared reports if the "users" edge to the User entity was cleared.
+func (m *OrganizationMutation) UsersCleared() bool {
+	return m.clearedusers
+}
+
+// RemoveUserIDs removes the "users" edge to the User entity by IDs.
+func (m *OrganizationMutation) RemoveUserIDs(ids ...int) {
+	if m.removedusers == nil {
+		m.removedusers = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.users, ids[i])
+		m.removedusers[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedUsers returns the removed IDs of the "users" edge to the User entity.
+func (m *OrganizationMutation) RemovedUsersIDs() (ids []int) {
+	for id := range m.removedusers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// UsersIDs returns the "users" edge IDs in the mutation.
+func (m *OrganizationMutation) UsersIDs() (ids []int) {
+	for id := range m.users {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetUsers resets all changes to the "users" edge.
+func (m *OrganizationMutation) ResetUsers() {
+	m.users = nil
+	m.clearedusers = false
+	m.removedusers = nil
 }
 
 // Where appends a list predicates to the OrganizationMutation builder.
@@ -209,9 +324,12 @@ func (m *OrganizationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *OrganizationMutation) Fields() []string {
-	fields := make([]string, 0, 1)
-	if m._order != nil {
-		fields = append(fields, organization.FieldOrder)
+	fields := make([]string, 0, 2)
+	if m.name != nil {
+		fields = append(fields, organization.FieldName)
+	}
+	if m.priority != nil {
+		fields = append(fields, organization.FieldPriority)
 	}
 	return fields
 }
@@ -221,8 +339,10 @@ func (m *OrganizationMutation) Fields() []string {
 // schema.
 func (m *OrganizationMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case organization.FieldOrder:
-		return m.Order()
+	case organization.FieldName:
+		return m.Name()
+	case organization.FieldPriority:
+		return m.Priority()
 	}
 	return nil, false
 }
@@ -232,8 +352,10 @@ func (m *OrganizationMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *OrganizationMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case organization.FieldOrder:
-		return m.OldOrder(ctx)
+	case organization.FieldName:
+		return m.OldName(ctx)
+	case organization.FieldPriority:
+		return m.OldPriority(ctx)
 	}
 	return nil, fmt.Errorf("unknown Organization field %s", name)
 }
@@ -243,12 +365,19 @@ func (m *OrganizationMutation) OldField(ctx context.Context, name string) (ent.V
 // type.
 func (m *OrganizationMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case organization.FieldOrder:
+	case organization.FieldName:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetOrder(v)
+		m.SetName(v)
+		return nil
+	case organization.FieldPriority:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPriority(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Organization field %s", name)
@@ -257,13 +386,21 @@ func (m *OrganizationMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *OrganizationMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addpriority != nil {
+		fields = append(fields, organization.FieldPriority)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *OrganizationMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case organization.FieldPriority:
+		return m.AddedPriority()
+	}
 	return nil, false
 }
 
@@ -272,6 +409,13 @@ func (m *OrganizationMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *OrganizationMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case organization.FieldPriority:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPriority(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Organization numeric field %s", name)
 }
@@ -299,8 +443,11 @@ func (m *OrganizationMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *OrganizationMutation) ResetField(name string) error {
 	switch name {
-	case organization.FieldOrder:
-		m.ResetOrder()
+	case organization.FieldName:
+		m.ResetName()
+		return nil
+	case organization.FieldPriority:
+		m.ResetPriority()
 		return nil
 	}
 	return fmt.Errorf("unknown Organization field %s", name)
@@ -308,49 +455,85 @@ func (m *OrganizationMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *OrganizationMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.users != nil {
+		edges = append(edges, organization.EdgeUsers)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *OrganizationMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case organization.EdgeUsers:
+		ids := make([]ent.Value, 0, len(m.users))
+		for id := range m.users {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *OrganizationMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.removedusers != nil {
+		edges = append(edges, organization.EdgeUsers)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *OrganizationMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case organization.EdgeUsers:
+		ids := make([]ent.Value, 0, len(m.removedusers))
+		for id := range m.removedusers {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *OrganizationMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedusers {
+		edges = append(edges, organization.EdgeUsers)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *OrganizationMutation) EdgeCleared(name string) bool {
+	switch name {
+	case organization.EdgeUsers:
+		return m.clearedusers
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *OrganizationMutation) ClearEdge(name string) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown Organization unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *OrganizationMutation) ResetEdge(name string) error {
+	switch name {
+	case organization.EdgeUsers:
+		m.ResetUsers()
+		return nil
+	}
 	return fmt.Errorf("unknown Organization edge %s", name)
 }
 
@@ -503,9 +686,53 @@ func (m *UserMutation) ResetUniversity() {
 	m.university = nil
 }
 
-// SetOrganizationID sets the "organization" edge to the Organization entity by id.
-func (m *UserMutation) SetOrganizationID(id int) {
-	m.organization = &id
+// SetOrganizationID sets the "organization_id" field.
+func (m *UserMutation) SetOrganizationID(i int) {
+	m.organization = &i
+}
+
+// OrganizationID returns the value of the "organization_id" field in the mutation.
+func (m *UserMutation) OrganizationID() (r int, exists bool) {
+	v := m.organization
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOrganizationID returns the old "organization_id" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldOrganizationID(ctx context.Context) (v *int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOrganizationID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOrganizationID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOrganizationID: %w", err)
+	}
+	return oldValue.OrganizationID, nil
+}
+
+// ClearOrganizationID clears the value of the "organization_id" field.
+func (m *UserMutation) ClearOrganizationID() {
+	m.organization = nil
+	m.clearedFields[user.FieldOrganizationID] = struct{}{}
+}
+
+// OrganizationIDCleared returns if the "organization_id" field was cleared in this mutation.
+func (m *UserMutation) OrganizationIDCleared() bool {
+	_, ok := m.clearedFields[user.FieldOrganizationID]
+	return ok
+}
+
+// ResetOrganizationID resets all changes to the "organization_id" field.
+func (m *UserMutation) ResetOrganizationID() {
+	m.organization = nil
+	delete(m.clearedFields, user.FieldOrganizationID)
 }
 
 // ClearOrganization clears the "organization" edge to the Organization entity.
@@ -515,15 +742,7 @@ func (m *UserMutation) ClearOrganization() {
 
 // OrganizationCleared reports if the "organization" edge to the Organization entity was cleared.
 func (m *UserMutation) OrganizationCleared() bool {
-	return m.clearedorganization
-}
-
-// OrganizationID returns the "organization" edge ID in the mutation.
-func (m *UserMutation) OrganizationID() (id int, exists bool) {
-	if m.organization != nil {
-		return *m.organization, true
-	}
-	return
+	return m.OrganizationIDCleared() || m.clearedorganization
 }
 
 // OrganizationIDs returns the "organization" edge IDs in the mutation.
@@ -576,9 +795,12 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 1)
+	fields := make([]string, 0, 2)
 	if m.university != nil {
 		fields = append(fields, user.FieldUniversity)
+	}
+	if m.organization != nil {
+		fields = append(fields, user.FieldOrganizationID)
 	}
 	return fields
 }
@@ -590,6 +812,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case user.FieldUniversity:
 		return m.University()
+	case user.FieldOrganizationID:
+		return m.OrganizationID()
 	}
 	return nil, false
 }
@@ -601,6 +825,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 	switch name {
 	case user.FieldUniversity:
 		return m.OldUniversity(ctx)
+	case user.FieldOrganizationID:
+		return m.OldOrganizationID(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -617,6 +843,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUniversity(v)
 		return nil
+	case user.FieldOrganizationID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOrganizationID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
 }
@@ -624,13 +857,16 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *UserMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *UserMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	}
 	return nil, false
 }
 
@@ -646,7 +882,11 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *UserMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(user.FieldOrganizationID) {
+		fields = append(fields, user.FieldOrganizationID)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -659,6 +899,11 @@ func (m *UserMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *UserMutation) ClearField(name string) error {
+	switch name {
+	case user.FieldOrganizationID:
+		m.ClearOrganizationID()
+		return nil
+	}
 	return fmt.Errorf("unknown User nullable field %s", name)
 }
 
@@ -668,6 +913,9 @@ func (m *UserMutation) ResetField(name string) error {
 	switch name {
 	case user.FieldUniversity:
 		m.ResetUniversity()
+		return nil
+	case user.FieldOrganizationID:
+		m.ResetOrganizationID()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)

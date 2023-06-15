@@ -5,6 +5,7 @@ package ent
 import (
 	"context"
 	"entdemo/ent/organization"
+	"entdemo/ent/user"
 	"errors"
 	"fmt"
 
@@ -19,10 +20,31 @@ type OrganizationCreate struct {
 	hooks    []Hook
 }
 
-// SetOrder sets the "order" field.
-func (oc *OrganizationCreate) SetOrder(s string) *OrganizationCreate {
-	oc.mutation.SetOrder(s)
+// SetName sets the "name" field.
+func (oc *OrganizationCreate) SetName(s string) *OrganizationCreate {
+	oc.mutation.SetName(s)
 	return oc
+}
+
+// SetPriority sets the "priority" field.
+func (oc *OrganizationCreate) SetPriority(i int) *OrganizationCreate {
+	oc.mutation.SetPriority(i)
+	return oc
+}
+
+// AddUserIDs adds the "users" edge to the User entity by IDs.
+func (oc *OrganizationCreate) AddUserIDs(ids ...int) *OrganizationCreate {
+	oc.mutation.AddUserIDs(ids...)
+	return oc
+}
+
+// AddUsers adds the "users" edges to the User entity.
+func (oc *OrganizationCreate) AddUsers(u ...*User) *OrganizationCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return oc.AddUserIDs(ids...)
 }
 
 // Mutation returns the OrganizationMutation object of the builder.
@@ -59,8 +81,16 @@ func (oc *OrganizationCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (oc *OrganizationCreate) check() error {
-	if _, ok := oc.mutation.Order(); !ok {
-		return &ValidationError{Name: "order", err: errors.New(`ent: missing required field "Organization.order"`)}
+	if _, ok := oc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Organization.name"`)}
+	}
+	if v, ok := oc.mutation.Name(); ok {
+		if err := organization.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Organization.name": %w`, err)}
+		}
+	}
+	if _, ok := oc.mutation.Priority(); !ok {
+		return &ValidationError{Name: "priority", err: errors.New(`ent: missing required field "Organization.priority"`)}
 	}
 	return nil
 }
@@ -88,9 +118,29 @@ func (oc *OrganizationCreate) createSpec() (*Organization, *sqlgraph.CreateSpec)
 		_node = &Organization{config: oc.config}
 		_spec = sqlgraph.NewCreateSpec(organization.Table, sqlgraph.NewFieldSpec(organization.FieldID, field.TypeInt))
 	)
-	if value, ok := oc.mutation.Order(); ok {
-		_spec.SetField(organization.FieldOrder, field.TypeString, value)
-		_node.Order = value
+	if value, ok := oc.mutation.Name(); ok {
+		_spec.SetField(organization.FieldName, field.TypeString, value)
+		_node.Name = value
+	}
+	if value, ok := oc.mutation.Priority(); ok {
+		_spec.SetField(organization.FieldPriority, field.TypeInt, value)
+		_node.Priority = value
+	}
+	if nodes := oc.mutation.UsersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   organization.UsersTable,
+			Columns: []string{organization.UsersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

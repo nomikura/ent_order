@@ -34,17 +34,23 @@ func (uu *UserUpdate) SetUniversity(s string) *UserUpdate {
 	return uu
 }
 
-// SetOrganizationID sets the "organization" edge to the Organization entity by ID.
-func (uu *UserUpdate) SetOrganizationID(id int) *UserUpdate {
-	uu.mutation.SetOrganizationID(id)
+// SetOrganizationID sets the "organization_id" field.
+func (uu *UserUpdate) SetOrganizationID(i int) *UserUpdate {
+	uu.mutation.SetOrganizationID(i)
 	return uu
 }
 
-// SetNillableOrganizationID sets the "organization" edge to the Organization entity by ID if the given value is not nil.
-func (uu *UserUpdate) SetNillableOrganizationID(id *int) *UserUpdate {
-	if id != nil {
-		uu = uu.SetOrganizationID(*id)
+// SetNillableOrganizationID sets the "organization_id" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableOrganizationID(i *int) *UserUpdate {
+	if i != nil {
+		uu.SetOrganizationID(*i)
 	}
+	return uu
+}
+
+// ClearOrganizationID clears the value of the "organization_id" field.
+func (uu *UserUpdate) ClearOrganizationID() *UserUpdate {
+	uu.mutation.ClearOrganizationID()
 	return uu
 }
 
@@ -158,17 +164,23 @@ func (uuo *UserUpdateOne) SetUniversity(s string) *UserUpdateOne {
 	return uuo
 }
 
-// SetOrganizationID sets the "organization" edge to the Organization entity by ID.
-func (uuo *UserUpdateOne) SetOrganizationID(id int) *UserUpdateOne {
-	uuo.mutation.SetOrganizationID(id)
+// SetOrganizationID sets the "organization_id" field.
+func (uuo *UserUpdateOne) SetOrganizationID(i int) *UserUpdateOne {
+	uuo.mutation.SetOrganizationID(i)
 	return uuo
 }
 
-// SetNillableOrganizationID sets the "organization" edge to the Organization entity by ID if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableOrganizationID(id *int) *UserUpdateOne {
-	if id != nil {
-		uuo = uuo.SetOrganizationID(*id)
+// SetNillableOrganizationID sets the "organization_id" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableOrganizationID(i *int) *UserUpdateOne {
+	if i != nil {
+		uuo.SetOrganizationID(*i)
 	}
+	return uuo
+}
+
+// ClearOrganizationID clears the value of the "organization_id" field.
+func (uuo *UserUpdateOne) ClearOrganizationID() *UserUpdateOne {
+	uuo.mutation.ClearOrganizationID()
 	return uuo
 }
 

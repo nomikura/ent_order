@@ -16,9 +16,32 @@ type Organization struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// Order holds the value of the "order" field.
-	Order        string `json:"order,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
+	// Priority holds the value of the "priority" field.
+	Priority int `json:"priority,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the OrganizationQuery when eager-loading is set.
+	Edges        OrganizationEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// OrganizationEdges holds the relations/edges for other nodes in the graph.
+type OrganizationEdges struct {
+	// Users holds the value of the users edge.
+	Users []*User `json:"users,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// UsersOrErr returns the Users value or an error if the edge
+// was not loaded in eager-loading.
+func (e OrganizationEdges) UsersOrErr() ([]*User, error) {
+	if e.loadedTypes[0] {
+		return e.Users, nil
+	}
+	return nil, &NotLoadedError{edge: "users"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -26,9 +49,9 @@ func (*Organization) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case organization.FieldID:
+		case organization.FieldID, organization.FieldPriority:
 			values[i] = new(sql.NullInt64)
-		case organization.FieldOrder:
+		case organization.FieldName:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -51,11 +74,17 @@ func (o *Organization) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			o.ID = int(value.Int64)
-		case organization.FieldOrder:
+		case organization.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field order", values[i])
+				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				o.Order = value.String
+				o.Name = value.String
+			}
+		case organization.FieldPriority:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field priority", values[i])
+			} else if value.Valid {
+				o.Priority = int(value.Int64)
 			}
 		default:
 			o.selectValues.Set(columns[i], values[i])
@@ -68,6 +97,11 @@ func (o *Organization) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (o *Organization) Value(name string) (ent.Value, error) {
 	return o.selectValues.Get(name)
+}
+
+// QueryUsers queries the "users" edge of the Organization entity.
+func (o *Organization) QueryUsers() *UserQuery {
+	return NewOrganizationClient(o.config).QueryUsers(o)
 }
 
 // Update returns a builder for updating this Organization.
@@ -93,8 +127,11 @@ func (o *Organization) String() string {
 	var builder strings.Builder
 	builder.WriteString("Organization(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", o.ID))
-	builder.WriteString("order=")
-	builder.WriteString(o.Order)
+	builder.WriteString("name=")
+	builder.WriteString(o.Name)
+	builder.WriteString(", ")
+	builder.WriteString("priority=")
+	builder.WriteString(fmt.Sprintf("%v", o.Priority))
 	builder.WriteByte(')')
 	return builder.String()
 }
