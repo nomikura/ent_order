@@ -16,10 +16,11 @@ func (Organization) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").
 			NotEmpty(),
-		field.Int("priority").
-			Annotations(
-				entgql.OrderField("PRIORITY"),
-			),
+		field.Int("priority"),
+		// .
+		// 	Annotations(
+		// 		entgql.OrderField("PRIORITY"),
+		// 	),
 	}
 }
 
@@ -31,6 +32,6 @@ func (Organization) Annotations() []schema.Annotation {
 			entgql.MutationCreate(),
 			entgql.MutationUpdate(),
 		),
-		entgql.MultiOrder(),
+		// entgql.MultiOrder(),
 	}
 }
