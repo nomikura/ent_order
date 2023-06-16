@@ -10,10 +10,10 @@ import (
 
 func main() {
 	ex, err := entgql.NewExtension(
-		// entgql.WithWhereInputs(true),                  // GraphQLファイルにXxxWhereInput型を生成する
-		entgql.WithConfigPath("../gqlgen.yml"), // 参照するGraphQLの設定ファイル
-		// entgql.WithSchemaGenerator(),                  // entからGraphQLの型定義を生成
-		entgql.WithSchemaPath("../graph/ent.graphql"), // entから生成するGraphQLファイルのパス
+	// entgql.WithWhereInputs(true),                  // GraphQLファイルにXxxWhereInput型を生成する
+	// entgql.WithConfigPath("../gqlgen.yml"), // 参照するGraphQLの設定ファイル
+	// entgql.WithSchemaGenerator(),                  // entからGraphQLの型定義を生成
+	// entgql.WithSchemaPath("../graph/ent.graphql"), // entから生成するGraphQLファイルのパス
 	)
 	if err != nil {
 		log.Fatalf("creating entgql extension: %v", err)
