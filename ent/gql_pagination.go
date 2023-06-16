@@ -340,6 +340,20 @@ func (o *OrganizationQuery) Paginate(
 }
 
 var (
+	// OrganizationOrderFieldName orders Organization by name.
+	OrganizationOrderFieldName = &OrganizationOrderField{
+		Value: func(o *Organization) (ent.Value, error) {
+			return o.Name, nil
+		},
+		column: organization.FieldName,
+		toTerm: organization.ByName,
+		toCursor: func(o *Organization) Cursor {
+			return Cursor{
+				ID:    o.ID,
+				Value: o.Name,
+			}
+		},
+	}
 	// OrganizationOrderFieldPriority orders Organization by priority.
 	OrganizationOrderFieldPriority = &OrganizationOrderField{
 		Value: func(o *Organization) (ent.Value, error) {
@@ -360,6 +374,8 @@ var (
 func (f OrganizationOrderField) String() string {
 	var str string
 	switch f.column {
+	case OrganizationOrderFieldName.column:
+		str = "NAME"
 	case OrganizationOrderFieldPriority.column:
 		str = "PRIORITY"
 	}
@@ -378,6 +394,8 @@ func (f *OrganizationOrderField) UnmarshalGQL(v interface{}) error {
 		return fmt.Errorf("OrganizationOrderField %T must be a string", v)
 	}
 	switch str {
+	case "NAME":
+		*f = *OrganizationOrderFieldName
 	case "PRIORITY":
 		*f = *OrganizationOrderFieldPriority
 	default:

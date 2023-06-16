@@ -15,7 +15,10 @@ type Organization struct {
 func (Organization) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").
-			NotEmpty(),
+			NotEmpty().
+			Annotations(
+				entgql.OrderField("NAME"),
+			),
 		field.Int("priority").
 			Annotations(
 				entgql.OrderField("PRIORITY"),
