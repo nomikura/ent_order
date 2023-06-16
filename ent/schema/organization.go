@@ -25,7 +25,6 @@ func (Organization) Fields() []ent.Field {
 
 func (Organization) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		// entgql.RelayConnection(),
-		// entgql.MultiOrder(),
+		entgql.MultiOrder(),
 	}
 }
