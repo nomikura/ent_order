@@ -24,6 +24,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Organization is the client for interacting with the Organization builders.
 	Organization *OrganizationClient
+	// additional fields for node api
+	tables tables
 }
 
 // NewClient creates a new client configured with the given options.

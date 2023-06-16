@@ -21,6 +21,8 @@ type OrganizationQuery struct {
 	order      []organization.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Organization
+	modifiers  []func(*sql.Selector)
+	loadTotal  []func(context.Context, []*Organization) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -342,6 +344,9 @@ func (oq *OrganizationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 		nodes = append(nodes, node)
 		return node.assignValues(columns, values)
 	}
+	if len(oq.modifiers) > 0 {
+		_spec.Modifiers = oq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -351,11 +356,19 @@ func (oq *OrganizationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	for i := range oq.loadTotal {
+		if err := oq.loadTotal[i](ctx, nodes); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
 func (oq *OrganizationQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := oq.querySpec()
+	if len(oq.modifiers) > 0 {
+		_spec.Modifiers = oq.modifiers
+	}
 	_spec.Node.Columns = oq.ctx.Fields
 	if len(oq.ctx.Fields) > 0 {
 		_spec.Unique = oq.ctx.Unique != nil && *oq.ctx.Unique

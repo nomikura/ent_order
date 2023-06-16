@@ -7,6 +7,7 @@ require (
 	entgo.io/ent v0.12.3
 	github.com/99designs/gqlgen v0.17.33
 	github.com/hashicorp/go-multierror v1.1.1
+	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/vektah/gqlparser/v2 v2.5.3
 	golang.org/x/sync v0.2.0
 )
