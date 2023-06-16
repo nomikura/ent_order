@@ -1,18 +1,31 @@
 package schema
 
-import "entgo.io/ent"
+import (
+	"entgo.io/contrib/entgql"
+	"entgo.io/ent"
+	"entgo.io/ent/schema"
+	"entgo.io/ent/schema/field"
+)
 
 // Organization holds the schema definition for the Organization entity.
 type Organization struct {
 	ent.Schema
 }
 
-// Fields of the Organization.
 func (Organization) Fields() []ent.Field {
-	return nil
+	return []ent.Field{
+		field.String("name").
+			NotEmpty(),
+		field.Int("priority").
+			Annotations(
+				entgql.OrderField("PRIORITY"),
+			),
+	}
 }
 
-// Edges of the Organization.
-func (Organization) Edges() []ent.Edge {
-	return nil
+func (Organization) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		// entgql.RelayConnection(),
+		// entgql.MultiOrder(),
+	}
 }
